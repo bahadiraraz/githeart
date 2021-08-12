@@ -5,6 +5,7 @@ import keyboard
 
 
 current_color = 0
+flag = True
 class GithubTabloItem(QAbstractButton):
     """
     Github Tablo tarzı Widget'ın elemanı
@@ -48,25 +49,32 @@ class GithubTabloItem(QAbstractButton):
 
     def keyPressEvent(self, event):
         global current_color
+        global flag
         if event.key() == Qt.Key_1:
             print(current_color)
             current_color = 0
-          
+            flag = True
         elif event.key() == Qt.Key_2:
             print(current_color)
             current_color = 1
-         
+            flag = True
         elif event.key() == Qt.Key_3:
             print(current_color)
             current_color = 2
-        
+            flag = True
         elif event.key() == Qt.Key_4:
             print(current_color)
             current_color = 3
-           
+            flag = True
         elif event.key() == Qt.Key_5:
             print(current_color)
             current_color = 4
+            flag = True
+        elif event.key() == Qt.Key_Escape:
+            flag = False
+            print("escape")
+            self.renk = 0
+            self.update()
   
             
         self.update()
@@ -75,12 +83,18 @@ class GithubTabloItem(QAbstractButton):
         global current_color
         current_color = (self.renk +1) % 4
         self.update()
+	
+    #if press the r key block enterEvent
+    
+
+
 
     def enterEvent(self, event):
-   
-        global current_color
-        print(current_color)
-        self.renk = current_color
+        global flag
+        if flag:
+            global current_color
+            print(current_color)
+            self.renk = current_color
 
 
 
