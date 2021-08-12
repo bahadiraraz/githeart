@@ -71,7 +71,10 @@ class GithubTabloItem(QAbstractButton):
             
         self.update()
     
-    
+    def mousePressEvent(self, event):
+        global current_color
+        current_color = (self.renk +1) % 4
+        self.update()
 
     def enterEvent(self, event):
    
