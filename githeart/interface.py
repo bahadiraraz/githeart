@@ -1,4 +1,4 @@
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QObject
 from PyQt5.QtWidgets import QApplication, QWidget, QVBoxLayout, QGridLayout, QAbstractButton, QLabel
 from PyQt5.QtGui import QColor, QPainter, QPen, QFont
 import keyboard
@@ -7,9 +7,10 @@ import numpy as np
 current_color = 0
 flag = True
 
+control = 0
 
-class GithubTabloItem(QAbstractButton, QThread):
-	current_color_info2 = pyqtSignal(int)
+
+class GithubTabloItem(QAbstractButton):
 	"""
 	Github Tablo tarzı Widget'ın elemanı
 
@@ -24,30 +25,37 @@ class GithubTabloItem(QAbstractButton, QThread):
 		QColor("#39d353"),
 	)
 
-	def __init__(self):
+	def __init__(self, parent):
+		self.parent = parent
+		global current_color
 		QAbstractButton.__init__(self)
-		QThread.__init__(self)
 		self.setMinimumSize(13, 13)
 		self.setStyleSheet("border: 0px;")
 		self.setStyleSheet("border-color: black;")
 		self.setCursor(Qt.PointingHandCursor)
-		self.renk = 0
+		self.renk = current_color
 
 	def paintEvent(self, event):
+		global control
 		painter = QPainter()
 		painter.begin(self)
 		painter.setPen(QPen(Qt.black, 1))
 		painter.setBrush(self.renkler[self.renk])
 		painter.drawRect(0, 0, self.width() - 1, self.height() - 1)
 		painter.end()
+		control = 0
 
 	def mouseReleaseEvent(self, event):
+		global control
 		global current_color
+		global flag
 		self.renk += 1
-		if self.renk > len(self.renkler) - 1:
-			self.renk = 0
+		self.renk = self.renk % 5
 		current_color = self.renk
 		self.update()
+		self.parent.current_color_info.emit(current_color)
+		control = 0
+		
 
 	def enterEvent(self, event):
 		global flag
@@ -75,7 +83,7 @@ class GithubTablo(QWidget):
 		self.layout.setSpacing(1)
 		for y in range(rows):
 			for x in range(cols):
-				self.layout.addWidget(GithubTabloItem(), x, y, alignment=Qt.AlignCenter)
+				self.layout.addWidget(GithubTabloItem(parent), x, y, alignment=Qt.AlignCenter)
 
 
 class MainWindow(QWidget, QThread):
@@ -87,27 +95,13 @@ class MainWindow(QWidget, QThread):
 
 		self.layout = QVBoxLayout()
 		self.setLayout(self.layout)
-
 		self.githubtablo = GithubTablo(self, 7, 50)
 		self.layout.addWidget(self.githubtablo)
-
 		p = self.palette()
 		p.setColor(self.backgroundRole(), QColor(13, 17, 23))
 		self.setPalette(p)
 
 		self.setWindowTitle("Github Tablo")
-
-		def print_colors():
-			g = list()
-			for y in range(50):
-				for x in range(7):
-					g.append(self.githubtablo.layout.itemAtPosition(x, y).widget().renk)
-			g = np.matrix(g).reshape(50, 7)
-			g = np.rot90(g, 3)
-			g = np.fliplr(g)
-			g = g.tolist()
-			for i in g: print(i)
-			print()
 
 		def clear_colors():
 			for y in range(50):
@@ -116,17 +110,15 @@ class MainWindow(QWidget, QThread):
 					self.githubtablo.layout.itemAtPosition(x, y).widget().update()
 
 		self.current_color_label = QLabel()
-		self.current_color_label.setText("")
+		self.current_color_label.setText("0")
 		self.current_color_label.setAlignment(Qt.AlignCenter)
-		self.current_color_info.emit(current_color)
 		self.current_color_label.setFont(QFont("ariel", 20))
 		self.current_color_label.setStyleSheet("color: rgb(255,255,255);")
+		self.current_color_info.emit(current_color)
 		self.current_color_info.connect(lambda data: self.current_color_label.setText(str(data)))
 		self.layout.addWidget(self.current_color_label)
-
-		keyboard.add_hotkey('p', print_colors)
 		keyboard.add_hotkey('c', clear_colors)
-
+		keyboard.add_hotkey('p', self.print_colors)
 
 	def keyPressEvent(self, event):
 		global current_color
@@ -152,8 +144,22 @@ class MainWindow(QWidget, QThread):
 			else:
 				flag = True
 			print("escape")
+
 		self.current_color_info.emit(current_color)
 
+	def print_colors(self):
+		global control
+		if control < 1:
+
+			g = []
+			for y in range(50):
+				for x in range(7):
+					g.append(self.githubtablo.layout.itemAtPosition(x, y).widget().renk)
+
+			g = np.matrix(g).reshape(50, 7).T.tolist()
+			print(*g, sep="\n")
+			print()
+			control += 1
 
 if __name__ == "__main__":
 	app = QApplication([])
