@@ -138,7 +138,7 @@ class MainWindow(QWidget, QThread):
 		elif event.key() == Qt.Key_5:
 			current_color = 4
 			flag = True
-		elif event.key() == Qt.Key_Escape:
+		elif event.key() == Qt.Key_E:
 			if flag:
 				flag = False
 			else:
