@@ -125,7 +125,7 @@ class MainWindow(QWidget, QThread):
 		self.githubtablo = GithubTablo(self, global_x, global_y)
 		self.mainLayout.addWidget(self.githubtablo)
 		self.layout = QHBoxLayout()
-		self.layout.setAlignment(Qt.AlignLeft)
+		self.layout.setContentsMargins(1, 1, 1, 1)
 		
 		self.mainLayout.addLayout(self.layout)
 
@@ -151,13 +151,18 @@ class MainWindow(QWidget, QThread):
 		#self.current_color_info.connect(lambda x : self.current_color_box.layout.widget().color)
 
 		self.current_mode = QLabel()
-		self.current_mode.setText("True")
+		self.current_mode.setText("ON")
 		self.current_mode.setFont(QFont("ariel", 10))
 		self.current_mode.setStyleSheet("color: rgb(255,255,255);")
 		self.paint_mode.emit(str(flag))
 		self.paint_mode.connect(
-			lambda data: self.current_mode.setText(str(data))
+			lambda : self.current_mode.setText("ON" if flag else "OFF")
 		)
+
+		self.current_mode_text = QLabel()
+		self.current_mode_text.setText("drawing mode:")
+		self.current_mode_text.setFont(QFont("ariel", 10))
+		self.current_mode_text.setStyleSheet("color: rgb(255,255,255);")
 
 		self.themeText = QLabel("Choose Color Theme:")
 		self.themeText.setFont(QFont("ariel", 8))
@@ -184,13 +189,14 @@ class MainWindow(QWidget, QThread):
 
 
 
-		self.layout.addWidget(self.current_color_box)
-		self.layout.addWidget(self.current_color_label)
-		self.layout.addWidget(self.current_mode)
-		self.layout.addSpacing(int(self.width()*0.7))
-		self.layout.addWidget(self.themeText)
-		self.layout.addWidget(self.themeComboBox)
-		
+		self.layout.addWidget(self.current_color_box,alignment=Qt.AlignLeft,stretch=0)
+		self.layout.addWidget(self.current_color_label,alignment=Qt.AlignLeft,stretch=1)
+		self.layout.addWidget(self.current_mode_text,alignment=Qt.AlignLeft,stretch =1)
+		self.layout.addWidget(self.current_mode,alignment=Qt.AlignLeft,stretch=20)
+
+		self.layout.addWidget(self.themeText,alignment=Qt.AlignRight)
+		self.layout.addWidget(self.themeComboBox,alignment=Qt.AlignRight)
+
 
 	def changeTheme(self):
 		global themeType
