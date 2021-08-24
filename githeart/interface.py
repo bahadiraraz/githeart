@@ -145,22 +145,18 @@ class MainWindow(QWidget, QThread):
 		#box showing the currently used color
 		self.current_color_box = GithubTablo(self,1,1)
 		self.current_color_box.setStyleSheet("background-color: rgb(255,255,255);")
-		self.layout.addWidget(self.current_color_box)
 
 		#print currnet_color_box color
 		self.current_color_info.connect(lambda data: self.current_color_box.layout.itemAt(0).widget().set_color(data-1))
 		self.current_color_box.setDisabled(True)
 		#self.current_color_info.connect(lambda x : self.current_color_box.layout.widget().color)
 
-		self.layout.addWidget(self.current_color_label)
 
 
 
 		self.themeText = QLabel("Choose Color Theme:")
 		self.themeText.setFont(QFont("ariel", 8))
 		self.themeText.setStyleSheet("color: rgb(255,255,255);")
-		self.layout.addSpacing(int(self.width()*0.7))
-		self.layout.addWidget(self.themeText)
 
 		self.themeComboBox = QComboBox()
 		self.themeComboBox.setStyleSheet("""
@@ -176,11 +172,19 @@ class MainWindow(QWidget, QThread):
 		self.themeComboBox.activated.connect(self.changeTheme)
 		self.themeComboBox.setFixedWidth(int(self.width()*0.3))
 		self.themeComboBox.addItems(themeList)
-		self.layout.addWidget(self.themeComboBox)
 
 
 		keyboard.add_hotkey("p", self.print_colors)
 		keyboard.add_hotkey("c", self.clear_colors)
+
+
+
+		self.layout.addWidget(self.current_color_box)
+		self.layout.addWidget(self.current_color_label)
+		self.layout.addSpacing(int(self.width()*0.7))
+		self.layout.addWidget(self.themeText)
+		self.layout.addWidget(self.themeComboBox)
+		
 
 	def changeTheme(self):
 		global themeType
