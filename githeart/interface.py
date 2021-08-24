@@ -2,6 +2,7 @@ from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtWidgets import (
 	QApplication,
 	QComboBox,
+	QHBoxLayout,
 	QWidget,
 	QVBoxLayout,
 	QGridLayout,
@@ -102,6 +103,7 @@ class GithubTablo(QWidget):
 	def __init__(self, parent, cols, rows):
 		super().__init__(parent)
 		self.layout = QGridLayout()
+		self.layout.setContentsMargins(0,0,0,0)
 		self.setLayout(self.layout)
 		self.layout.setSpacing(1)
 		for y in range(rows):
@@ -118,18 +120,22 @@ class MainWindow(QWidget, QThread):
 		QThread.__init__(self)
 		QWidget.__init__(self)
 		self.setWindowTitle("Github Tablo")
-		self.layout = QVBoxLayout()
-		self.setLayout(self.layout)
+		self.mainLayout = QVBoxLayout()
+		self.setLayout(self.mainLayout)
 
 		self.githubtablo = GithubTablo(self, global_x, global_y)
-		self.layout.addWidget(self.githubtablo)
+		self.mainLayout.addWidget(self.githubtablo)
+		self.layout = QHBoxLayout()
+		self.layout.setAlignment(Qt.AlignLeft)
+		
+		self.mainLayout.addLayout(self.layout)
+
 		palet = self.palette()
 		palet.setColor(self.backgroundRole(), QColor(13, 17, 23))
 		self.setPalette(palet)
 		self.current_color_label = QLabel()
 		self.current_color_label.setText("1")
-		self.current_color_label.setAlignment(Qt.AlignCenter)
-		self.current_color_label.setFont(QFont("ariel", 20))
+		self.current_color_label.setFont(QFont("ariel", 10))
 		self.current_color_label.setStyleSheet("color: rgb(255,255,255);")
 		self.current_color_info.emit(current_color +1)
 		self.current_color_info.connect(
@@ -150,17 +156,27 @@ class MainWindow(QWidget, QThread):
 
 
 
-		self.themeText = QLabel("------- Choose Color Theme -------\n↓")
-		self.themeText.setAlignment(Qt.AlignCenter)
+		self.themeText = QLabel("Choose Color Theme:")
 		self.themeText.setFont(QFont("ariel", 8))
 		self.themeText.setStyleSheet("color: rgb(255,255,255);")
-		self.layout.addWidget(self.themeText,alignment=Qt.AlignCenter)
+		self.layout.addSpacing(int(self.width()*0.7))
+		self.layout.addWidget(self.themeText)
 
 		self.themeComboBox = QComboBox()
+		self.themeComboBox.setStyleSheet("""
+		QComboBox{
+		background-color:rgb(26, 34, 46);
+		color:rgb(255, 255, 255);
+		border:hidden;}
+		QComboBox QAbstractItemView {
+		background-color:rgb(26, 34, 46);
+		color:rgb(255, 255, 255);
+		}
+		""")
 		self.themeComboBox.activated.connect(self.changeTheme)
 		self.themeComboBox.setFixedWidth(int(self.width()*0.3))
 		self.themeComboBox.addItems(themeList)
-		self.layout.addWidget(self.themeComboBox,alignment=Qt.AlignCenter)
+		self.layout.addWidget(self.themeComboBox)
 
 
 		keyboard.add_hotkey("p", self.print_colors)
@@ -169,6 +185,7 @@ class MainWindow(QWidget, QThread):
 	def changeTheme(self):
 		global themeType
 		themeType = self.themeComboBox.currentText().lower()
+		self.current_color_info.emit(current_color+1)
 	def keyPressEvent(self, event):
 		global current_color, flag
 		if event.key() == Qt.Key_1:
