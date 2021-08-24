@@ -1,6 +1,7 @@
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtWidgets import (
 	QApplication,
+	QComboBox,
 	QWidget,
 	QVBoxLayout,
 	QGridLayout,
@@ -17,14 +18,36 @@ flag = True
 global_x = 7
 global_y = 53
 
+themeType = "default"
+themeList = ["Default","Red","Blue","Pink"]
+
 class GithubTabloItem(QAbstractButton):
-	renkler = (
+	renkler = {
+		"default":(
 		QColor("#161b22"),
 		QColor("#0e4429"),
 		QColor("#006d32"),
 		QColor("#26a641"),
-		QColor("#39d353"),
-	)
+		QColor("#39d353")),
+		"red":(
+		QColor("#161b22"),
+		QColor("#440e0e"),
+		QColor("#6d0000"),
+		QColor("#a62626"),
+		QColor("#d33939")),
+		"blue":(
+		QColor("#161b22"),
+		QColor("#0e4444"),
+		QColor("#006d6d"),
+		QColor("#26a4a6"),
+		QColor("#39d0d3")),
+		"pink":(
+		QColor("#161b22"),
+		QColor("#440e3f"),
+		QColor("#6d0060"),
+		QColor("#a62699"),
+		QColor("#d339ce"))
+	}
 
 	def __init__(self, parent):
 		global current_color
@@ -40,7 +63,7 @@ class GithubTabloItem(QAbstractButton):
 		painter = QPainter()
 		painter.begin(self)
 		painter.setPen(QPen(Qt.black, 1))
-		painter.setBrush(self.renkler[self.renk])
+		painter.setBrush(self.renkler[themeType][self.renk])
 		painter.drawRect(0, 0, self.width() - 1, self.height() - 1)
 		painter.end()
 		control = 0
@@ -124,9 +147,28 @@ class MainWindow(QWidget, QThread):
 		#self.current_color_info.connect(lambda x : self.current_color_box.layout.widget().renk)
 
 		self.layout.addWidget(self.current_color_label)
+
+
+
+		self.themeText = QLabel("------- Choose Color Theme -------\n↓")
+		self.themeText.setAlignment(Qt.AlignCenter)
+		self.themeText.setFont(QFont("ariel", 8))
+		self.themeText.setStyleSheet("color: rgb(255,255,255);")
+		self.layout.addWidget(self.themeText,alignment=Qt.AlignCenter)
+
+		self.themeComboBox = QComboBox()
+		self.themeComboBox.activated.connect(self.changeTheme)
+		self.themeComboBox.setFixedWidth(int(self.width()*0.3))
+		self.themeComboBox.addItems(themeList)
+		self.layout.addWidget(self.themeComboBox,alignment=Qt.AlignCenter)
+
+
 		keyboard.add_hotkey("p", self.print_colors)
 		keyboard.add_hotkey("c", self.clear_colors)
 
+	def changeTheme(self):
+		global themeType
+		themeType = self.themeComboBox.currentText().lower()
 	def keyPressEvent(self, event):
 		global current_color, flag
 		if event.key() == Qt.Key_1:
