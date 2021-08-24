@@ -22,7 +22,7 @@ themeType = "default"
 themeList = ["Default","Red","Blue","Pink"]
 
 class GithubTabloItem(QAbstractButton):
-	renkler = {
+	colors = {
 		"default":(
 		QColor("#161b22"),
 		QColor("#0e4429"),
@@ -55,15 +55,15 @@ class GithubTabloItem(QAbstractButton):
 		self.parent = parent
 		self.setMinimumSize(13, 13)
 		self.setCursor(Qt.PointingHandCursor)
-		self.renk = current_color
+		self.color = current_color
 
 	def paintEvent(self, event):
 		global control
-		self.renk = self.renk % 5
+		self.color = self.color % 5
 		painter = QPainter()
 		painter.begin(self)
 		painter.setPen(QPen(Qt.black, 1))
-		painter.setBrush(self.renkler[themeType][self.renk])
+		painter.setBrush(self.colors[themeType][self.color])
 		painter.drawRect(0, 0, self.width() - 1, self.height() - 1)
 		painter.end()
 		control = 0
@@ -72,16 +72,16 @@ class GithubTabloItem(QAbstractButton):
 		print(event.buttons())
 		global control, current_color, flag
 		if event.button() == Qt.LeftButton:
-			self.renk += 1
-			self.renk = self.renk % 5
-			current_color = self.renk
+			self.color += 1
+			self.color = self.color % 5
+			current_color = self.color
 			self.update()
 			self.parent.current_color_info.emit(current_color +1)
 			control = 0
 		else:
-			self.renk -= 1
-			self.renk = self.renk % 5
-			current_color = self.renk
+			self.color -= 1
+			self.color = self.color % 5
+			current_color = self.color
 			self.update()
 			self.parent.current_color_info.emit(current_color + 1)
 			control = 0
@@ -89,12 +89,12 @@ class GithubTabloItem(QAbstractButton):
 	def enterEvent(self, event):
 		global current_color, flag
 		if flag:
-			self.renk = current_color
+			self.color = current_color
 			self.update()
 	
 	def set_color(self, color):
-		self.renk = self.renk % 5
-		self.renk = color
+		self.color = self.color % 5
+		self.color = color
 		print(color)
 		self.update()
 
@@ -144,7 +144,7 @@ class MainWindow(QWidget, QThread):
 		#print currnet_color_box color
 		self.current_color_info.connect(lambda data: self.current_color_box.layout.itemAt(0).widget().set_color(data-1))
 		self.current_color_box.setDisabled(True)
-		#self.current_color_info.connect(lambda x : self.current_color_box.layout.widget().renk)
+		#self.current_color_info.connect(lambda x : self.current_color_box.layout.widget().color)
 
 		self.layout.addWidget(self.current_color_label)
 
@@ -197,7 +197,7 @@ class MainWindow(QWidget, QThread):
 			g = list()
 			for y in range(global_y):
 				for x in range(global_x):
-					g.append(self.githubtablo.layout.itemAtPosition(x, y).widget().renk)
+					g.append(self.githubtablo.layout.itemAtPosition(x, y).widget().color)
 			g = np.matrix(g).reshape(global_y, global_x).T.tolist()
 			control += 1
 			print(*g, sep="\12")
@@ -205,7 +205,7 @@ class MainWindow(QWidget, QThread):
 	def clear_colors(self):
 		for y in range(global_y):
 			for x in range(global_x):
-				self.githubtablo.layout.itemAtPosition(x, y).widget().renk = 0
+				self.githubtablo.layout.itemAtPosition(x, y).widget().color = 0
 				self.githubtablo.layout.itemAtPosition(x, y).widget().update()
 
 
