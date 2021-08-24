@@ -218,7 +218,6 @@ class MainWindow(QWidget, QThread):
 		elif event.key() == Qt.Key_5:
 			current_color = 4
 		elif event.key() == Qt.Key_E:
-			print("escape")
 			if flag:
 				flag = False
 			else:
@@ -237,6 +236,7 @@ class MainWindow(QWidget, QThread):
 			g = np.matrix(g).reshape(global_y, global_x).T.tolist()
 			control += 1
 			print(*g, sep="\12")
+			print()
 
 	def clear_colors(self):
 		for y in range(global_y):
