@@ -10,11 +10,12 @@ paintable github contribute table
 
  - clear:
    - c key
- - paint mode on turn off
+ - drawing mode mode on turn off
    - e key
  - print paint matrix
    - p key
 
+# showcase
 
 ![Animation3333](https://user-images.githubusercontent.com/48323786/130656806-4e445c1e-9648-448d-8968-fa8fd804c636.gif)
 
