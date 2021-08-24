@@ -14,7 +14,8 @@ import numpy as np
 current_color = 0
 control = 0
 flag = True
-
+global_x = 7
+global_y = 53
 
 class GithubTabloItem(QAbstractButton):
 	renkler = (
@@ -45,13 +46,22 @@ class GithubTabloItem(QAbstractButton):
 		control = 0
 
 	def mouseReleaseEvent(self, event):
+		print(event.buttons())
 		global control, current_color, flag
-		self.renk += 1
-		self.renk = self.renk % 5
-		current_color = self.renk
-		self.update()
-		self.parent.current_color_info.emit(current_color +1)
-		control = 0
+		if event.button() == Qt.LeftButton:
+			self.renk += 1
+			self.renk = self.renk % 5
+			current_color = self.renk
+			self.update()
+			self.parent.current_color_info.emit(current_color +1)
+			control = 0
+		else:
+			self.renk -= 1
+			self.renk = self.renk % 5
+			current_color = self.renk
+			self.update()
+			self.parent.current_color_info.emit(current_color + 1)
+			control = 0
 
 	def enterEvent(self, event):
 		global current_color, flag
@@ -79,6 +89,7 @@ class GithubTablo(QWidget):
 
 
 class MainWindow(QWidget, QThread):
+	global global_x,global_y
 	current_color_info = pyqtSignal(int)
 	def __init__(self):
 		QThread.__init__(self)
@@ -86,7 +97,8 @@ class MainWindow(QWidget, QThread):
 		self.setWindowTitle("Github Tablo")
 		self.layout = QVBoxLayout()
 		self.setLayout(self.layout)
-		self.githubtablo = GithubTablo(self, 7, 50)
+
+		self.githubtablo = GithubTablo(self, global_x, global_y)
 		self.layout.addWidget(self.githubtablo)
 		palet = self.palette()
 		palet.setColor(self.backgroundRole(), QColor(13, 17, 23))
@@ -100,6 +112,7 @@ class MainWindow(QWidget, QThread):
 		self.current_color_info.connect(
 			lambda data: self.current_color_label.setText(str(data))
 		)
+
 		#box showing the currently used color
 		self.current_color_box = GithubTablo(self,1,1)
 		self.current_color_box.setStyleSheet("background-color: rgb(255,255,255);")
@@ -114,25 +127,20 @@ class MainWindow(QWidget, QThread):
 		keyboard.add_hotkey("p", self.print_colors)
 		keyboard.add_hotkey("c", self.clear_colors)
 
-
 	def keyPressEvent(self, event):
 		global current_color, flag
 		if event.key() == Qt.Key_1:
 			current_color = 0
-			flag = True
 		elif event.key() == Qt.Key_2:
 			current_color = 1
-			flag = True
 		elif event.key() == Qt.Key_3:
 			current_color = 2
-			flag = True
 		elif event.key() == Qt.Key_4:
 			current_color = 3
-			flag = True
 		elif event.key() == Qt.Key_5:
 			current_color = 4
-			flag = True
 		elif event.key() == Qt.Key_E:
+			print("escape")
 			if flag:
 				flag = False
 			else:
@@ -145,17 +153,16 @@ class MainWindow(QWidget, QThread):
 		global control
 		if control < 1:
 			g = list()
-			for y in range(50):
-				for x in range(7):
+			for y in range(global_y):
+				for x in range(global_x):
 					g.append(self.githubtablo.layout.itemAtPosition(x, y).widget().renk)
-			g = np.matrix(g).reshape(50, 7).T.tolist()
+			g = np.matrix(g).reshape(global_y, global_x).T.tolist()
 			control += 1
 			print(*g, sep="\12")
 
-
 	def clear_colors(self):
-		for y in range(50):
-			for x in range(7):
+		for y in range(global_y):
+			for x in range(global_x):
 				self.githubtablo.layout.itemAtPosition(x, y).widget().renk = 0
 				self.githubtablo.layout.itemAtPosition(x, y).widget().update()
 
