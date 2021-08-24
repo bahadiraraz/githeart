@@ -70,7 +70,6 @@ class GithubTabloItem(QAbstractButton):
 		control = 0
 
 	def mouseReleaseEvent(self, event):
-		print(event.buttons())
 		global control, current_color, flag
 		if event.button() == Qt.LeftButton:
 			self.color += 1
@@ -96,7 +95,6 @@ class GithubTabloItem(QAbstractButton):
 	def set_color(self, color):
 		self.color = self.color % 5
 		self.color = color
-		print(color)
 		self.update()
 
 class GithubTablo(QWidget):
@@ -116,6 +114,7 @@ class GithubTablo(QWidget):
 class MainWindow(QWidget, QThread):
 	global global_x,global_y
 	current_color_info = pyqtSignal(int)
+	paint_mode = pyqtSignal(str)
 	def __init__(self):
 		QThread.__init__(self)
 		QWidget.__init__(self)
@@ -151,8 +150,14 @@ class MainWindow(QWidget, QThread):
 		self.current_color_box.setDisabled(True)
 		#self.current_color_info.connect(lambda x : self.current_color_box.layout.widget().color)
 
-
-
+		self.current_mode = QLabel()
+		self.current_mode.setText("True")
+		self.current_mode.setFont(QFont("ariel", 10))
+		self.current_mode.setStyleSheet("color: rgb(255,255,255);")
+		self.paint_mode.emit(str(flag))
+		self.paint_mode.connect(
+			lambda data: self.current_mode.setText(str(data))
+		)
 
 		self.themeText = QLabel("Choose Color Theme:")
 		self.themeText.setFont(QFont("ariel", 8))
@@ -181,6 +186,7 @@ class MainWindow(QWidget, QThread):
 
 		self.layout.addWidget(self.current_color_box)
 		self.layout.addWidget(self.current_color_label)
+		self.layout.addWidget(self.current_mode)
 		self.layout.addSpacing(int(self.width()*0.7))
 		self.layout.addWidget(self.themeText)
 		self.layout.addWidget(self.themeComboBox)
@@ -190,6 +196,9 @@ class MainWindow(QWidget, QThread):
 		global themeType
 		themeType = self.themeComboBox.currentText().lower()
 		self.current_color_info.emit(current_color+1)
+		self.themeComboBox.keyPressEvent = self.keyPressEvent
+		self.update()
+
 	def keyPressEvent(self, event):
 		global current_color, flag
 		if event.key() == Qt.Key_1:
@@ -208,7 +217,7 @@ class MainWindow(QWidget, QThread):
 				flag = False
 			else:
 				flag = True
-
+		self.paint_mode.emit(str(flag))
 		self.current_color_info.emit(current_color+1)
 
 
