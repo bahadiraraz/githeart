@@ -2,7 +2,7 @@
 
 paintable github contribute table
 
-![image](https://user-images.githubusercontent.com/48323786/130625675-945dcc00-dcc9-45d5-8319-29d8fd5c3b13.png)
+![image](https://github.com/myygunduz/githeart/blob/main/assets/gif.gif)
  
  # how to use:
  - color select:
