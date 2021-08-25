@@ -7,12 +7,11 @@ paintable github contribute table
  # how to use:
  - color select:
    -  1,2,3,4,5 key
-
  - clear:
    - c key
- - drawing mode mode on turn off
+ - drawing mode mode on turn off:
    - e key
- - print paint matrix
+ - print paint matrix:
    - p key
 
 # showcase
