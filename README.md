@@ -21,7 +21,7 @@ paintable github contribute table
 
 ![image](https://user-images.githubusercontent.com/48323786/130627200-977b979b-7243-4e57-9c6f-77a3fe5d9db5.png)
 
-# Share This Repository
+<h2 align=center> Share This Repository<h2/>
 
 <table align='center'>
     <tr>
