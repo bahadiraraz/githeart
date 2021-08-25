@@ -5,14 +5,29 @@ paintable github contribute table
 ![image](https://user-images.githubusercontent.com/48323786/130625675-945dcc00-dcc9-45d5-8319-29d8fd5c3b13.png)
  
  # how to use:
- - color select:
-   -  1,2,3,4,5 key
- - clear:
-   - c key
- - drawing mode mode on turn off:
-   - e key
- - print paint matrix:
-   - p key
+ 
+ <table>
+  <tr>
+    <th>Functions</th>
+    <th>key</th>
+  </tr>
+  <tr>
+    <td>color select</td>
+    <td>1,2,3,4,5</td>
+  </tr>
+ <tr>
+    <td>clear</td>
+    <td>c</td>
+  </tr>
+ <tr>
+    <td>drawing mode mode on turn off</td>
+    <td>e</td>
+  </tr>
+ <tr>
+    <td>print paint matrix</td>
+    <td>p</td>
+  </tr>
+</table>
 
 # showcase
 
