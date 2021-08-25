@@ -70,7 +70,6 @@ class GithubTabloItem(QAbstractButton):
 		control = 0
 
 	def mouseReleaseEvent(self, event):
-		print(event.buttons())
 		global control, current_color, flag
 		if event.button() == Qt.LeftButton:
 			self.color += 1
@@ -96,7 +95,6 @@ class GithubTabloItem(QAbstractButton):
 	def set_color(self, color):
 		self.color = self.color % 5
 		self.color = color
-		print(color)
 		self.update()
 
 class GithubTablo(QWidget):
@@ -116,6 +114,7 @@ class GithubTablo(QWidget):
 class MainWindow(QWidget, QThread):
 	global global_x,global_y
 	current_color_info = pyqtSignal(int)
+	paint_mode = pyqtSignal(str)
 	def __init__(self):
 		QThread.__init__(self)
 		QWidget.__init__(self)
@@ -126,7 +125,7 @@ class MainWindow(QWidget, QThread):
 		self.githubtablo = GithubTablo(self, global_x, global_y)
 		self.mainLayout.addWidget(self.githubtablo)
 		self.layout = QHBoxLayout()
-		self.layout.setAlignment(Qt.AlignLeft)
+		self.layout.setContentsMargins(1, 1, 1, 1)
 		
 		self.mainLayout.addLayout(self.layout)
 
@@ -151,8 +150,19 @@ class MainWindow(QWidget, QThread):
 		self.current_color_box.setDisabled(True)
 		#self.current_color_info.connect(lambda x : self.current_color_box.layout.widget().color)
 
+		self.current_mode = QLabel()
+		self.current_mode.setText("ON")
+		self.current_mode.setFont(QFont("ariel", 10))
+		self.current_mode.setStyleSheet("color: rgb(255,255,255);")
+		self.paint_mode.emit(str(flag))
+		self.paint_mode.connect(
+			lambda : self.current_mode.setText("ON" if flag else "OFF")
+		)
 
-
+		self.current_mode_text = QLabel()
+		self.current_mode_text.setText("drawing mode:")
+		self.current_mode_text.setFont(QFont("ariel", 10))
+		self.current_mode_text.setStyleSheet("color: rgb(255,255,255);")
 
 		self.themeText = QLabel("Choose Color Theme:")
 		self.themeText.setFont(QFont("ariel", 8))
@@ -179,17 +189,22 @@ class MainWindow(QWidget, QThread):
 
 
 
-		self.layout.addWidget(self.current_color_box)
-		self.layout.addWidget(self.current_color_label)
-		self.layout.addSpacing(int(self.width()*0.7))
-		self.layout.addWidget(self.themeText)
-		self.layout.addWidget(self.themeComboBox)
-		
+		self.layout.addWidget(self.current_color_box,alignment=Qt.AlignLeft,stretch=0)
+		self.layout.addWidget(self.current_color_label,alignment=Qt.AlignLeft,stretch=1)
+		self.layout.addWidget(self.current_mode_text,alignment=Qt.AlignLeft,stretch =1)
+		self.layout.addWidget(self.current_mode,alignment=Qt.AlignLeft,stretch=20)
+
+		self.layout.addWidget(self.themeText,alignment=Qt.AlignRight)
+		self.layout.addWidget(self.themeComboBox,alignment=Qt.AlignRight)
+
 
 	def changeTheme(self):
 		global themeType
 		themeType = self.themeComboBox.currentText().lower()
 		self.current_color_info.emit(current_color+1)
+		self.themeComboBox.keyPressEvent = self.keyPressEvent
+		self.update()
+
 	def keyPressEvent(self, event):
 		global current_color, flag
 		if event.key() == Qt.Key_1:
@@ -203,12 +218,11 @@ class MainWindow(QWidget, QThread):
 		elif event.key() == Qt.Key_5:
 			current_color = 4
 		elif event.key() == Qt.Key_E:
-			print("escape")
 			if flag:
 				flag = False
 			else:
 				flag = True
-
+		self.paint_mode.emit(str(flag))
 		self.current_color_info.emit(current_color+1)
 
 
@@ -222,6 +236,7 @@ class MainWindow(QWidget, QThread):
 			g = np.matrix(g).reshape(global_y, global_x).T.tolist()
 			control += 1
 			print(*g, sep="\12")
+			print()
 
 	def clear_colors(self):
 		for y in range(global_y):
