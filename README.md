@@ -1,7 +1,8 @@
-## githeart
-
-paintable github contribute table
-
+<div align="center">
+<h1>❤️ githeart</h1>
+ <h3>paintable github contribute table</h3>
+</div>
+ 
 ![image](https://user-images.githubusercontent.com/48323786/130625675-945dcc00-dcc9-45d5-8319-29d8fd5c3b13.png)
  
  # how to use:
